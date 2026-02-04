@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sellamo menu</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href=".gitignore">
+
+</head>
+<body   class="body">
+    <header class="header">
+    <div class="container header__row">
+      <div class="brand">Sellamo</div>
+      <div class="controls">
+        <input id="search" class="input search" placeholder="Rechercher... / بحث" />
+      </div>
+      <button id="openCart" class="btn btn--light">
+        🛒 <span id="cartCount" class="badge">0</span>
+      </button>
+      
+    </div>
+    <div id="categorie">
+
+      </div>
+  </header>
+
+
+<div class="page">
+        <h2 id="name" class="cat-title"></h2>
+        <div class="grid" style="color: black;" id="product">
+</div>
+</div>
+
+ <div id="caractereOverlay" class="caractere-overlay" aria-hidden="true"></div>
+ <div class="caractere" id="caractereModal" aria-hidden="true">
+   <button class="caractere__close" id="caractereClose" type="button" aria-label="Close">×</button>
+   <div class="caractere__content">
+     <img class="caractere__img" id="caractereImg" alt="" />
+     <div class="caractere__options" id="caractereOptions"></div>
+   </div>
+ </div>
+
+ <div id="cartOverlay" class="cart-overlay" aria-hidden="true"></div>
+ <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
+   <div class="cart-header">
+     <div class="cart-title">Votre Panier</div>
+     <button id="closeCart" class="cart-close" type="button" aria-label="Close">×</button>
+   </div>
+   <div id="cartItems" class="cart-items"></div>
+   <div class="cart-footer">
+     <div class="cart-total-row">
+       <div>Total</div>
+       <div id="cartTotal" class="cart-total">0.00 DT</div>
+     </div>
+     <button id="demanderBtn" class="btn btn--primary cart-demander" type="button">Demander</button>
+   </div>
+ </aside>
+
+ <div id="toast" class="toast" aria-hidden="true"></div>
+
+       <script  src="../js/script.js"></script>
+</body>
+</html>
