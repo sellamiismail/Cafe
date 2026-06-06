@@ -61,7 +61,7 @@ function renderCaractereOptions(caractere) {
 function openCaractereModal(product) {
     if (!product || !caractereModal) return;
     if (caractereImg) {
-        caractereImg.src = product.img ? `../img/${product.img}` : "";
+        caractereImg.src = product.img ? `${product.img}` : "";
         caractereImg.alt = product.idname || "";
     }
     renderCaractereOptions(product.caractere);
@@ -241,7 +241,7 @@ function renderCart() {
         const img = document.createElement("img");
         img.className = "cart-thumb";
         img.alt = "";
-        img.src = item.img ? `../img/${item.img}` : "";
+        img.src = item.img ? `${item.img}` : "";
 
         const right = document.createElement("div");
 
@@ -306,7 +306,7 @@ function createCard(product) {
     const img = document.createElement("img");
     img.className = "card_img";
     img.alt = "";
-    img.src = `../img/${product.img}`;
+    img.src = `${product.img}`;
     img.addEventListener("click", () => openCaractereModal(product));
 
     const meta = document.createElement("div");
@@ -471,42 +471,14 @@ async function sendOrder() {
         if (!res.ok) {
             throw new Error(`Request failed (${res.status})`);
         }
+
         const data = await res.json();
         if (!data || data.success !== true) {
             throw new Error("Server returned error");
         }
 
         // emit a socket notification so serveur UI updates in real time
-        try {
-            if (!window.__sellamo_socket_loading) {
-                window.__sellamo_socket_loading = true;
-                const s = document.createElement('script');
-                // load socket.io client from the admin server (port 4000)
-                s.src = 'http://localhost:4000/socket.io/socket.io.js';
 
-                s.onload = () => {
-                    try {
-                        // explicitly connect to admin socket server (root origin)
-                        console.log('Socket.IO client script loaded from http://localhost:4000');
-                        window.__sellamo_socket = io('http://localhost:4000');
-                        window.__sellamo_socket.on('connect', () => console.log('sellamo socket connected', window.__sellamo_socket.id));
-                        window.__sellamo_socket.on('connect_error', (err) => console.error('sellamo socket connect_error', err));
-                        window.__sellamo_socket.on('disconnect', (reason) => console.log('sellamo socket disconnected', reason));
-                    } catch (_e) {
-                        console.log('Failed to initialize sellamo socket.io client', _e);
-                    }
-                    window.__sellamo_socket_loading = false;
-                };
-                s.onerror = () => { window.__sellamo_socket_loading = false; };
-                document.head.appendChild(s);
-            }
-            // if socket already available emit immediately, otherwise emit after small delay if initialized
-            const emitPayload = { items, totale, timestamp: Date.now() };
-            const doEmit = () => { try { window.__sellamo_socket && window.__sellamo_socket.emit('client-new-order', emitPayload); } catch (e) {} };
-            if (window.__sellamo_socket) doEmit(); else setTimeout(doEmit, 700);
-        } catch (e) {
-            // silent
-        }
 
         cart = [];
         persistCart();
