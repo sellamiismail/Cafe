@@ -120,10 +120,14 @@ app.get('/product', async (req, res) => {
 // create order
 app.post('/demander', async (req, res) => {
   const payload = req.body || {};
-  const numtable =10;
+  const numtable = Number(req.body.numtable);
+
+if (!numtable) {
+  return res.status(400).json({ success: false, error: "INVALID_TABLE" });
+}
  
   const items = Array.isArray(payload.items) ? payload.items : [];
-  const totale = Number(payload.totale);
+  const totale = Number(payload.totale);10
   
   if (!items.length){
     return res.status(400).json({ success: false, error: 'EMPTY_CART' });
