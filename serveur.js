@@ -120,16 +120,20 @@ app.get('/product', async (req, res) => {
 // create order
 app.post('/demander', async (req, res) => {
   const payload = req.body || {};
-  const numtable = 16;
+  const numtable =10;
+ 
   const items = Array.isArray(payload.items) ? payload.items : [];
   const totale = Number(payload.totale);
-
-  if (!items.length)
+  
+  if (!items.length){
     return res.status(400).json({ success: false, error: 'EMPTY_CART' });
-
-  if (!totale)
+    console.log('⚠️ Empty cart received');
+    }
+ 
+  if (!totale){
+    console.log('⚠️ Invalid total received');
     return res.status(400).json({ success: false, error: 'INVALID_TOTAL' });
-
+  }
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10);
   const timeStr = now.toTimeString().slice(0, 8);
@@ -146,33 +150,41 @@ app.post('/demander', async (req, res) => {
 
     if (verifyTable.rowCount === 0) {
       const recuInsert = await client.query(
-        'INSERT INTO recu (id, totale, date, heurd, heurf) VALUES ($1,$2,$3,$4,$5) RETURNING idrecu',
-        [numtable, totale, dateStr, timeStr, null]
+        'INSERT INTO recu (id, totale, date, heurd, heurf, type) VALUES ($1,$2,$3,$4,$5,$6) RETURNING idrecu',
+        [numtable, totale, dateStr, timeStr, null, 'pending']
+        
       );
+      
 
       idrecu = recuInsert.rows[0].idrecu;
 
-      await client.query(
-        'UPDATE tablee SET type=$1, idrecu=$2 WHERE id=$3',
-        ['occupied', idrecu, numtable]
-      );
+    }  else {
+    idrecu = verifyTable.rows[0].idrecu;
+      
+    const updateResult = await client.query(
+        'UPDATE recu SET totale=totale+$1 , type=$3 WHERE idrecu=$2 RETURNING idrecu, totale',
+        [Number(totale), idrecu, 'pending']
+    );
+console.log('ℹ️ Existing open recu found for table', numtable, 'with idrecu:', idrecu);
+    if (updateResult.rowCount > 0) {
+        console.log('✅ Updated existing recu:', updateResult.rows[0]);
     } else {
-      idrecu = verifyTable.rows[0].idrecu;
+        console.log('⚠️ No recu was updated. Something went wrong.');
     }
-
+} 
     for (const item of items) {
       await client.query(
-        'INSERT INTO orderr (idrecu, id, idname, optionn,status) VALUES ($1,$2,$3,$4,$5)',
-        [idrecu, numtable, String(item.idname), item.optionn ?? null, 'online']
+        'INSERT INTO orderr (idrecu, id, idname, optionn,status,type) VALUES ($1,$2,$3,$4,$5,$6 )',
+        [idrecu, numtable, String(item.idname), item.optionn ?? null, 'online', 'Pending']
       );
     }
-
+console.log('ℹ️ Current idrecu:', idrecu);
     await client.query('COMMIT');
 
     res.json({ success: true, idrecu });
   } catch (err) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK');         
     console.error(err);
     res.status(500).json({ success: false });
   }
-});
+}); 
