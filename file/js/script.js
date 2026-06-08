@@ -16,7 +16,10 @@ const caractereModal = document.getElementById("caractereModal");
 const caractereClose = document.getElementById("caractereClose");
 const caractereImg = document.getElementById("caractereImg");
 const caractereOptions = document.getElementById("caractereOptions");
+const params = new URLSearchParams(window.location.search);
+const numtable = Number(params.get("table")) || 1;
 
+console.log("TABLE =", numtable);
 let selectedCategory = "Tous";
 let categories = [];
 let products = [];
@@ -464,7 +467,11 @@ async function sendOrder() {
         const res = await fetch("/demander", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ totale, items }),
+            body: JSON.stringify({
+                totale,
+                items,
+                numtable
+            }),
         });
         console.log('Received response from /demander:', res);
         
